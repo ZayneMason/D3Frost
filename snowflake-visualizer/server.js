@@ -31,8 +31,6 @@ function createSnowflakeConnectionPool(account, accessUrl, username, password) {
     });
 }
 
-async function testConnection() { await snowflakeConnection.isValidAsync(); }
-
 // POST to connect to Snowflake
 router.post('/snowflake-connect', function(req, res, next) {
   console.log(req.body);
@@ -50,6 +48,8 @@ router.post('/snowflake-connect', function(req, res, next) {
 
 // POST to test Snowflake connection
 router.post('/snowflake-test', function(req, res, next) {
+  const snowflakeConnection = createSnowflakeConnection(req.body.account, req.body.accessUrl, req.body.username, req.body.password);
+  async function testConnection() { await snowflakeConnection.isValidAsync(); }
   if (testConnection()) {
     res.send('Connection is valid!');
   }
@@ -63,11 +63,10 @@ router.post('/snowflake-schema', function(req, res, next) {
   const snowflakeConnectionPool = createSnowflakeConnectionPool(req.body.account, req.body.accessUrl, req.body.username, req.body.password);
   snowflakeConnectionPool.use(async (clientConnection) =>
   {
-    const statement = await clientConnection.execute({
+    await clientConnection.execute({
         sqlText: 'show terse schemas;',
         complete: function (err, stmt, rows)
         {
-            resultRows = '';
             if (err)
             {
                 res.send('Failed to execute statement due to the following error: ' + err.message);
@@ -83,12 +82,11 @@ router.post('/snowflake-schema', function(req, res, next) {
 router.post('/snowflake-query', function(req, res, next) {
   const snowflakeConnectionPool = createSnowflakeConnectionPool(req.body.account, req.body.accessUrl, req.body.username, req.body.password);
   snowflakeConnectionPool.use(async (clientConnection) =>
-{
-    const statement = await clientConnection.execute({
+  {
+    await clientConnection.execute({
         sqlText: 'select * from ' + req.body.database + '.' + req.body.schema + '.' + req.body.table + ';',
         complete: function (err, stmt, rows)
         {
-            resultRows = '';
             if (err)
             {
                 res.send('Failed to execute statement due to the following error: ' + err.message);
@@ -99,6 +97,6 @@ router.post('/snowflake-query', function(req, res, next) {
   });
 });
 
-var server = app.listen(5000, function() {
+app.listen(5000, function() {
   console.log('Node server is running on http://localhost:5000..');
 });
