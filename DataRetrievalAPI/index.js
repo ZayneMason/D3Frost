@@ -4,7 +4,7 @@ let app = express();
 let router = express.Router();
 app.use('/api/', router);
 
-// Import Snowflake SDK and create a connection object and connection pool object
+// Import Snowflake SDK and define functions for creating connections and connection pools
 var snowflake = require('snowflake-sdk');
 
 function createSnowflakeConnection(account, accessUrl, username, password) {
@@ -56,7 +56,7 @@ router.post('/snowflake-test', function(req, res, next) {
   }
 });
 
-// POST to get list of databases
+// POST to get list of databases/schemas in Snowflake
 router.post('/snowflake-databases', function(req, res, next) {
   const snowflakeConnectionPool = createSnowflakeConnectionPool(req.body.account, req.body.accessUrl, req.body.username, req.body.password, req.body.min, req.body.max);
   snowflakeConnectionPool.use(async (clientConnection) =>
@@ -83,7 +83,7 @@ router.post('/snowflake-query', function(req, res, next) {
   snowflakeConnectionPool.use(async (clientConnection) =>
 {
     const statement = await clientConnection.execute({
-        sqlText: 'select * from TPCDS_SF100TCL.CALL_CENTER ;',
+        sqlText: 'select * from ' + req.body.database + '.' + req.body.schema + '.' + req.body.table + ';',
         complete: function (err, stmt, rows)
         {
             resultRows = '';
