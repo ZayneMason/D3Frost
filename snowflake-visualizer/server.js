@@ -1,6 +1,8 @@
 // Express setup
 let express = require('express');
 var app = express();
+var cors = require('cors');
+app.use(cors({origin: '*'}))
 let router = express.Router();
 app.use(express.json());
 app.use('/api/', router);
