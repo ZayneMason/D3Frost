@@ -35,7 +35,6 @@ function createSnowflakeConnectionPool(account, accessUrl, username, password) {
 
 // POST to connect to Snowflake
 router.post('/snowflake-connect', function(req, res, next) {
-  console.log(req.body);
   const snowflakeConnection = createSnowflakeConnection(req.body.account, req.body.accessUrl, req.body.username, req.body.password);
   snowflakeConnection.connect(function(err, conn) {
     console.log('Connecting to Snowflake...')
@@ -44,6 +43,7 @@ router.post('/snowflake-connect', function(req, res, next) {
     } else {
         let connectionID = conn.getId();
         res.send('Successfully connected to Snowflake. Connection ID: ' + connectionID + '.');
+        res.redirect('/dashboard');
     }
   });
 });
@@ -95,6 +95,36 @@ router.post('/snowflake-query', function(req, res, next) {
             }
             res.send(rows);
         }
+    });
+  });
+});
+
+router.post('/snowflake-tables', function(req, res, next) {
+  const snowflakeConnectionPool = createSnowflakeConnectionPool(req.body.account, req.body.accessUrl, req.body.username, req.body.password);
+  snowflakeConnectionPool.use(async (clientConnection) =>
+  {
+    await clientConnection.execute({
+      sqlText: 'USE ' + req.body.database + ';',
+      complete: function (err, stmt, rows)
+      {
+          if (err)
+          {
+              res.send('Failed to execute statement due to the following error: ' + err.message);
+          }
+          else {
+            clientConnection.execute({
+            sqlText: 'SHOW TABLES IN ' + req.body.database + '.' + req.body.schema + ';',
+            complete: function (err, stmt, rows)
+            {
+                if (err)
+                {
+                    res.send('Failed to execute statement due to the following error: ' + err.message);
+                }
+                res.send(rows);
+            }
+            });
+          }
+      }
     });
   });
 });
