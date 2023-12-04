@@ -1,5 +1,6 @@
 import './SchemaList.css';
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import axios from 'axios';
 
 const SchemaList = () => {
@@ -48,7 +49,12 @@ const SchemaList = () => {
                 <h3>{database.database}</h3>
                 <ul>
                   {database.schemas.map((schema, index) => (
-                   <a href={'/data/' + database.database + '/' + schema}><li key={index}>{schema}</li></a>
+                    
+                      <li key={index}>
+                        <Link to={'/data/' + database.database + '/' + schema} state={{database: database.database, schema: schema}}>
+                          {schema}
+                        </Link>
+                      </li>
                   ))}
                 </ul>
               </ul>
