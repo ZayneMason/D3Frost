@@ -16,15 +16,4 @@ h1 {
   justify-content: center;
 }
 
-.scroll_container {
-  padding-left: 0;
-  padding-right: 0;
-  display: flex;
-  position: absolute;
-  background-color: rgb(185, 185, 185);
-  white-space: nowrap;
-  .row {
-    display: inline-block;
-    border: 1px solid black;
-  }
-}
+
