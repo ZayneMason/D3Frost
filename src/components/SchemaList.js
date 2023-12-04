@@ -1,11 +1,14 @@
 import './SchemaList.css';
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { List, ListSubheader,ListItemButton } from '@mui/material';
 import axios from 'axios';
 
 const SchemaList = () => {
   const [setSchemaData] = useState([]);
   const [sortedSchemaData, setSortedSchemaData] = useState({});
+  const [expanded, setExpanded] = useState([]);
+
   useEffect(() => {
     axios.post('http://localhost:5000/api/snowflake-schema', 
     {
@@ -35,32 +38,40 @@ const SchemaList = () => {
       .catch(error => console.log(error));
   }, [setSchemaData, setSortedSchemaData]);
 
-
-  
+  const handleToggle = (databaseName) => {
+    if (expanded.includes(databaseName)) {
+      setExpanded(expanded.filter((name) => name !== databaseName));
+    } else {
+      setExpanded([...expanded, databaseName]);
+    }
+  }
 
   return (
     <div>
       <h2>Schema List</h2>
       <hr />
-        <div className='list'>
-          {Object.values(sortedSchemaData).map((database, index) => (
-            <div key={index}>
-              <ul>
-                <h3>{database.database}</h3>
+      <div className='list'>
+        {Object.values(sortedSchemaData).map((database, index) => (
+          <div key={index}>
+            <List>
+              <ListItemButton onClick={() => handleToggle(database.database)}><h3>{database.database}</h3></ListItemButton>
+              {expanded.includes(database.database) && (
                 <ul>
                   {database.schemas.map((schema, index) => (
-                    
-                      <li key={index}>
-                        <Link to={'/data/' + database.database + '/' + schema} state={{database: database.database, schema: schema}}>
+                    <List key={index} >
+                      <ListItemButton component="a">
+                        <Link to={'/data/' + database.database + '/' + schema} state={{database: database.database, schema: schema, query_type: 'tables'}}>
                           {schema}
                         </Link>
-                      </li>
+                      </ListItemButton>
+                    </List>
                   ))}
                 </ul>
-              </ul>
-            </div>
-          ))}
-        </div>
+              )}
+            </List>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

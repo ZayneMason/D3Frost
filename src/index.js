@@ -6,7 +6,8 @@ import App from './App';
 import Dashboard from './components/Dashboard';
 import SnowFlakeConnection from './components/SnowFlakeConnection';
 import reportWebVitals from './reportWebVitals';
-import Query from './components/Query';
+import QueryBuilder from './components/QueryBuilder';
+import Schema from './components/Schema';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -16,7 +17,8 @@ root.render(
         <Route path="/" element={<App />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/login" element={<SnowFlakeConnection />} />
-        <Route path="/data/:database/:schema" element={<Query />} />
+        <Route path="/data/:database/:schema" element={<Schema />} />
+        <Route path="/query-builder" element={QueryBuilder}/>
       </Routes>
     </BrowserRouter>
   </React.StrictMode>

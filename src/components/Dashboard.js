@@ -1,6 +1,7 @@
 import '../App.css'
 import SchemaList from './SchemaList';
 import { Link } from 'react-router-dom';
+import { Button } from '@mui/material';
 
 const Dashboard = () => {
   if (localStorage.getItem('accountUrl') === null) {
@@ -20,6 +21,9 @@ const Dashboard = () => {
         <h1>Welcome to your Dashboard</h1>
         <hr />
         <SchemaList />
+        <Link to="/query-builder">
+          <Button>Query Builder</Button>
+        </Link>
       </div>
     );
   }

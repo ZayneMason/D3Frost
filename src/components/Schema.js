@@ -6,7 +6,7 @@ import MaterialTable from 'material-table';
 import './Query.css';
 
 
-const Query = () => {
+const Schema = () => {
   const [queryResult, setQueryResult] = useState([]);
   const location = useLocation();
   const { state } = location;
@@ -14,7 +14,7 @@ const Query = () => {
   
   console.log(Object.entries(state));
   useEffect(() => {
-    axios.post('http://localhost:5000/api/snowflake-tables',
+    axios.post('http://localhost:5000/api/snowflake-' + Object.entries(state)[2][1],
     {
       accoutUrl: localStorage.getItem('accountUrl'),
       account: localStorage.getItem('account'),
@@ -32,39 +32,50 @@ const Query = () => {
       
   }, [setQueryResult, state]);
   
-  console.log(queryResult[0] || 'No data');
-  console.log(Object.values(queryResult))
-
   let columns = Object.keys(queryResult[0] || {}).map((key) => {
     return {
       title: key,
       field: key
     }
   });
-  console.log(columns);
+
+  let options = () => {
+    if (Object.values(queryResult).length > 0) {
+      return {
+        isLoading: false,
+        search: true,
+        exportAllData: true,
+        exportButton: true,
+        exportFileName: 'query_results'
+      }
+    }
+    else {
+      return {
+        isLoading: true,
+        exportAllData: false,
+        emptyDataSourceMessage: 'No data to display'
+      }
+    }
+  }
 
   return(
-    <div>
+    <div className='container'>
       <link
         rel="stylesheet"
         href="https://fonts.googleapis.com/icon?family=Material+Icons"
       />
-      <div className='container'>
-        <div className='scroll_container' style={{maxWidth: '60%'}}>
+      <div className='scroll_container' style={{maxWidth: '60%', minWidth: '60%'}}>
         <ThemeProvider theme={theme}>
           <MaterialTable
-            title="Query Results"
+            title={Object.entries(state)[0][1]}
             columns={columns}
             data={queryResult || [{}]}
-            options={{
-              isLoading: true
-            }}
+            options={options()}
           />
         </ThemeProvider>
-        </div>
       </div>
     </div>
   );
 };
 
-export default Query;
+export default Schema;
